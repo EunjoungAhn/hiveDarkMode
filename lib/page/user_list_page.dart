@@ -94,6 +94,10 @@ late Box<InputForm> _inputFormBox;
                   ListTile(
                     title: Text(users[i].name),
                     subtitle: Text(users[i].age.toString()),
+                    trailing: IconButton(onPressed: () {
+                      final inputForm = users[i];
+                      inputFormBox.delete(inputForm.key);
+                    }, icon: const Icon(Icons.delete),),
                   );
               },),
             );
