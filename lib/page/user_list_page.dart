@@ -16,13 +16,14 @@ class UserListPageState extends State<UserListPage> {
 TextEditingController nameController = TextEditingController();
 TextEditingController ageController = TextEditingController();
 
-final users = <InputForm>[];
 late Box _darkMode;
+late Box<InputForm> _inputFormBox;
 
 @override
   void initState() {
     super.initState();
     _darkMode = Hive.box('darkModeBox');
+    _inputFormBox = Hive.box<InputForm>('inputFormBox');
   }
 
 
@@ -42,10 +43,8 @@ late Box _darkMode;
           CupertinoSwitch(
                 value: isDarkMode,
                 onChanged: (val) {
-                  setState(() {
-                    isDarkMode = val;
-                    _darkMode.put('darkMode', val);
-                  });
+                  isDarkMode = val;
+                  _darkMode.put('darkMode', val);
                 },
               ),
               const SizedBox(width: 10),
@@ -68,7 +67,7 @@ late Box _darkMode;
               ),
             ),
             ElevatedButton(onPressed: () {
-              users.add(InputForm(
+              _inputFormBox.add(InputForm(
                 name: nameController.text, 
                 age: int.parse(ageController.text)
                 ),
@@ -78,18 +77,27 @@ late Box _darkMode;
           ],
         ),
         const Divider(),
-        Expanded(
-          child: users.isEmpty ? const Text('empty') :
-          ListView.builder(
-            //itemBuilder에서 목록을 보여줄때는 itemCount가 필요하다.
-            itemCount: users.length,
-            itemBuilder: (context, i) {
-            return
-              ListTile(
-                title: Text(users[i].name),
-                subtitle: Text(users[i].age.toString()),
-              );
-          },),
+        ValueListenableBuilder(
+          valueListenable: Hive.box<InputForm>('inputFormBox').listenable(),
+          builder: (context, Box<InputForm> inputFormBox, widget) {
+
+          final users = inputFormBox.values.toList();
+
+
+            return Expanded(
+              child: users.isEmpty ? const Text('empty') :
+              ListView.builder(
+                //itemBuilder에서 목록을 보여줄때는 itemCount가 필요하다.
+                itemCount: users.length,
+                itemBuilder: (context, i) {
+                return
+                  ListTile(
+                    title: Text(users[i].name),
+                    subtitle: Text(users[i].age.toString()),
+                  );
+              },),
+            );
+          }
         ),
       ]),
     );

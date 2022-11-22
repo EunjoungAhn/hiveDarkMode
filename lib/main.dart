@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:image_picker/model/inputform.dart';
 import 'package:image_picker/page/user_list_page.dart';
 
 void main() async {
@@ -10,7 +11,10 @@ void main() async {
 
 Future<void> _initHive() async {
   await Hive.initFlutter();
+  Hive.registerAdapter(InputFormAdapter());
+  //앱이 실행될때 box(테이블)에 저장되어 있는 값을 가져오기 위해 등록
   await Hive.openBox('darkModeBox');
+  await Hive.openBox<InputForm>('inputFormBox');
 }
 
 class MyApp extends StatelessWidget {
